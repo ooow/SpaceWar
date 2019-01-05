@@ -15,6 +15,10 @@
 		DFBD514421E1598600BAD754 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFBD514221E1598600BAD754 /* Main.storyboard */; };
 		DFBD514621E1598800BAD754 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFBD514521E1598800BAD754 /* Assets.xcassets */; };
 		DFBD514921E1598800BAD754 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFBD514721E1598800BAD754 /* LaunchScreen.storyboard */; };
+		DFBD515321E15A6D00BAD754 /* shot.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DFBD515121E15A6D00BAD754 /* shot.mp3 */; };
+		DFBD515421E15A6D00BAD754 /* bang.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DFBD515221E15A6D00BAD754 /* bang.mp3 */; };
+		DFBD515F21E15C0600BAD754 /* Bang.sks in Resources */ = {isa = PBXBuildFile; fileRef = DFBD515D21E15C0600BAD754 /* Bang.sks */; };
+		DFBD516121E160A100BAD754 /* StarSpace.sks in Resources */ = {isa = PBXBuildFile; fileRef = DFBD516021E160A100BAD754 /* StarSpace.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +32,10 @@
 		DFBD514521E1598800BAD754 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFBD514821E1598800BAD754 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DFBD514A21E1598800BAD754 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DFBD515121E15A6D00BAD754 /* shot.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = shot.mp3; sourceTree = "<group>"; };
+		DFBD515221E15A6D00BAD754 /* bang.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = bang.mp3; sourceTree = "<group>"; };
+		DFBD515D21E15C0600BAD754 /* Bang.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Bang.sks; sourceTree = "<group>"; };
+		DFBD516021E160A100BAD754 /* StarSpace.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = StarSpace.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,9 +68,12 @@
 		DFBD513721E1598600BAD754 /* SpaceWar */ = {
 			isa = PBXGroup;
 			children = (
+				DFBD515021E15A4400BAD754 /* audio */,
 				DFBD513821E1598600BAD754 /* AppDelegate.swift */,
 				DFBD513A21E1598600BAD754 /* GameScene.sks */,
 				DFBD513C21E1598600BAD754 /* Actions.sks */,
+				DFBD515D21E15C0600BAD754 /* Bang.sks */,
+				DFBD516021E160A100BAD754 /* StarSpace.sks */,
 				DFBD513E21E1598600BAD754 /* GameScene.swift */,
 				DFBD514021E1598600BAD754 /* GameViewController.swift */,
 				DFBD514221E1598600BAD754 /* Main.storyboard */,
@@ -71,6 +82,15 @@
 				DFBD514A21E1598800BAD754 /* Info.plist */,
 			);
 			path = SpaceWar;
+			sourceTree = "<group>";
+		};
+		DFBD515021E15A4400BAD754 /* audio */ = {
+			isa = PBXGroup;
+			children = (
+				DFBD515221E15A6D00BAD754 /* bang.mp3 */,
+				DFBD515121E15A6D00BAD754 /* shot.mp3 */,
+			);
+			path = audio;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -132,8 +152,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFBD514421E1598600BAD754 /* Main.storyboard in Resources */,
+				DFBD515421E15A6D00BAD754 /* bang.mp3 in Resources */,
+				DFBD515F21E15C0600BAD754 /* Bang.sks in Resources */,
 				DFBD513B21E1598600BAD754 /* GameScene.sks in Resources */,
+				DFBD515321E15A6D00BAD754 /* shot.mp3 in Resources */,
 				DFBD514621E1598800BAD754 /* Assets.xcassets in Resources */,
+				DFBD516121E160A100BAD754 /* StarSpace.sks in Resources */,
 				DFBD514921E1598800BAD754 /* LaunchScreen.storyboard in Resources */,
 				DFBD513D21E1598600BAD754 /* Actions.sks in Resources */,
 			);
@@ -295,6 +319,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = SpaceWar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -312,6 +337,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = SpaceWar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
