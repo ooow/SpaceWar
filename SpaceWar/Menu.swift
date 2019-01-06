@@ -14,6 +14,7 @@ class Menu: SKScene {
     var newGameButton: SKSpriteNode!;
     var levelButton: SKSpriteNode!;
     var labelLevel: SKLabelNode!;
+    var scoreLabel: SKLabelNode!;
     
     override func didMove(to view: SKView) {
         starSpace = (self.childNode(withName: "starSpaceAnimation") as! SKEmitterNode);
@@ -22,9 +23,12 @@ class Menu: SKScene {
         newGameButton = (self.childNode(withName: "newGameButton") as! SKSpriteNode);
         levelButton = (self.childNode(withName: "levelButton") as! SKSpriteNode);
         labelLevel = (self.childNode(withName: "labelLevenButton") as! SKLabelNode);
+        scoreLabel = (self.childNode(withName: "scoreLabel") as! SKLabelNode);
+        
+        let score = UserDefaults.standard.integer(forKey: "userScore");
+        scoreLabel.text = String(score);
         
         let userLevel = UserDefaults.standard;
-        
         if userLevel.bool(forKey: "hard") {
             labelLevel.text = "HARD";
         } else {

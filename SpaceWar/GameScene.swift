@@ -94,6 +94,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bang?.removeFromParent();
         }
         score += 5;
+        saveScore();
     }
     
     @objc func addAlien() {
@@ -208,6 +209,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             // Present the scene
             view.presentScene(scene, transition: transition);
+        }
+    }
+    
+    func saveScore(){
+        let userScore = UserDefaults.standard;
+        
+        if userScore.integer(forKey: "userScore") < score {
+            userScore.setValue(score, forKey: "userScore");
+            userScore.synchronize();
         }
     }
     
