@@ -15,11 +15,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var starSpace: SKEmitterNode!;
     var scoreLabel: SKLabelNode!;
     var player: SKSpriteNode!;
+    var menuButton: SKSpriteNode!;
     var gameTimer: Timer!;
     let motionManager = CMMotionManager();
-
-    let height: CGFloat = 667;
-    let width: CGFloat = 375;
+    
+    let height: CGFloat = UIScreen.main.bounds.height;
+    let width: CGFloat = UIScreen.main.bounds.width;
     let accelerometerUpdateInterval = 0.2;
     var xAccelerate: CGFloat = 0;
     
@@ -39,6 +40,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(initStarSpace());
         self.addChild(initScoreLabel());
         self.addChild(initPlayer());
+        self.addChild(initMenuButton());
+        
+        if UserDefaults.standard.bool(forKey: "hard") {
+            aliensTimeInterval = 0.4;
+        }
         
         gameTimer = Timer.scheduledTimer(timeInterval: aliensTimeInterval, target: self,
                                          selector: #selector(addAlien), userInfo: nil, repeats: true);
@@ -53,7 +59,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didSimulatePhysics() {
         let potencialNewPosition = player.position.x + xAccelerate * 60;
-        if potencialNewPosition > -width && potencialNewPosition < width {
+        if potencialNewPosition > 0 && potencialNewPosition < width {
             player.position.x = potencialNewPosition;
         }
     }
@@ -66,7 +72,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bulletBody = contact.bodyA; // Is a bullet.
             alienBody = contact.bodyB; // Is a alien.
         }
-    
+        
         if (alienBody.categoryBitMask & alienCategory) != 0 &&
             (bulletBody.categoryBitMask & bulletCategory) != 0 {
             collisionElements(alien: alienBody.node as! SKSpriteNode,
@@ -94,14 +100,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         aliens = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: aliens) as! [String];
         
         let alien = SKSpriteNode(imageNamed: aliens[0]); // Get random alien image.
-        let availableWidth = Int(width - 40);
-        let availableHeight = height + 100;
-        let availablePositionDiapason = GKRandomDistribution(lowestValue: -availableWidth,
-                                                             highestValue: availableWidth);
+        let availablePositionDiapason = GKRandomDistribution(lowestValue: 10,
+                                                             highestValue: Int(width - 10));
         let position = CGFloat(availablePositionDiapason.nextInt());
         
-        alien.position = CGPoint(x: position, y: availableHeight);
-        alien.setScale(2);
+        alien.position = CGPoint(x: position, y: height + alien.size.height);
         
         alien.physicsBody = SKPhysicsBody(rectangleOf: alien.size);
         alien.physicsBody?.isDynamic = true;
@@ -113,7 +116,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let animationDuration: TimeInterval = 6; // The alien moving speed.
         var actions = [SKAction]();
-        actions.append(SKAction.move(to: CGPoint(x: position, y: -availableHeight),
+        actions.append(SKAction.move(to: CGPoint(x: position, y: -alien.size.height),
                                      duration: animationDuration));
         actions.append(SKAction.removeFromParent()); // Remove the alien after going out of the screen.
         
@@ -125,7 +128,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let bullet = SKSpriteNode(imageNamed: "torpedo"); // Get bullet image.
         bullet.position = CGPoint(x: player.position.x, y: player.position.y + 5);
-        bullet.setScale(2);
         
         bullet.physicsBody = SKPhysicsBody(circleOfRadius: bullet.size.width / 2);
         bullet.physicsBody?.isDynamic = true;
@@ -157,18 +159,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func initPlayer() -> SKSpriteNode {
         player = SKSpriteNode(imageNamed: "shuttle");
-        player.position = CGPoint(x: 0, y: -height / 2 - 150);
-        player.setScale(2);
+        player.position = CGPoint(x: width / 2, y: 40);
         return player;
     }
     
     func initScoreLabel() -> SKLabelNode {
         scoreLabel = SKLabelNode(text: "Score: 0");
-        scoreLabel.fontName = "AmericanTypewritter-Bold";
-        scoreLabel.fontSize = 36;
+        scoreLabel.fontName = "Helvetica-Bold";
+        scoreLabel.fontSize = 20;
         scoreLabel.fontColor = UIColor.white;
-        scoreLabel.position = CGPoint(x: -width + 80, y: height - 40);
+        scoreLabel.position = CGPoint(x: 50, y: height - 30);
         return scoreLabel;
+    }
+    
+    func initMenuButton() -> SKSpriteNode {
+        menuButton = SKSpriteNode(imageNamed: "menuIcon");
+        menuButton.position = CGPoint(x: width - 20, y: height - 20);
+        menuButton.name = "menuButton";
+        menuButton.size = CGSize(width: 20, height: 20);
+        return menuButton;
     }
     
     func configureSelf() {
@@ -177,7 +186,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        fireBullet();
+        let touch = touches.first;
+        
+        if let location = touch?.location(in: self) {
+            let nodesArray = self.nodes(at: location);
+            
+            if nodesArray.first?.name == "menuButton" {
+                // Load the SKScene from 'GameScene.sks'
+                chaneScene(scene: SKScene(fileNamed: "Menu")!);
+            } else {
+                fireBullet();
+            }
+        }
+    }
+    
+    func chaneScene(scene: SKScene){
+        if let view = self.view {
+            // Set the scale mode to scale to fit the window
+            scene.scaleMode = .aspectFill;
+            let transition = SKTransition.flipVertical(withDuration: 0.5);
+            
+            // Present the scene
+            view.presentScene(scene, transition: transition);
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {
