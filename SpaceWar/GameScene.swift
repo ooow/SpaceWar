@@ -24,10 +24,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let accelerometerUpdateInterval = 0.2;
     var xAccelerate: CGFloat = 0;
     
-    let alienCategory: UInt32 = 0x1 << 1;
     let bulletCategory: UInt32 = 0x1 << 0;
+    let playerCategory: UInt32 = 0x1 << 1;
+    let alienCategory: UInt32 = 0x1 << 2;
+    
     var aliensTimeInterval: TimeInterval = 0.75;
     var aliens = ["alien", "alien2", "alien3"];
+    var isGameOver = false;
     var score: Int = 0 {
         didSet {
             scoreLabel.text = "Score: \(score)";
@@ -65,22 +68,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
-        var bulletBody: SKPhysicsBody = contact.bodyB;
-        var alienBody: SKPhysicsBody = contact.bodyA;
+        var bodyA: SKPhysicsBody = contact.bodyA;
+        var bodyB: SKPhysicsBody = contact.bodyB;
         
         if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
-            bulletBody = contact.bodyA; // Is a bullet.
-            alienBody = contact.bodyB; // Is a alien.
+            bodyB = contact.bodyA;
+            bodyA = contact.bodyB;
         }
         
-        if (alienBody.categoryBitMask & alienCategory) != 0 &&
-            (bulletBody.categoryBitMask & bulletCategory) != 0 {
-            collisionElements(alien: alienBody.node as! SKSpriteNode,
-                              bullet: bulletBody.node as! SKSpriteNode);
+        if (bodyA.categoryBitMask & alienCategory) != 0 &&
+            (bodyB.categoryBitMask & bulletCategory) != 0 {
+            killAlien(alien: bodyA.node as! SKSpriteNode,
+                      bullet: bodyB.node as! SKSpriteNode);
+        } else if (bodyA.categoryBitMask & alienCategory) != 0 &&
+            (bodyB.categoryBitMask & playerCategory) != 0 {
+            killPlayer(alien: bodyA.node as! SKSpriteNode);
         }
     }
     
-    func collisionElements(alien: SKSpriteNode, bullet: SKSpriteNode){
+    func killAlien(alien: SKSpriteNode, bullet: SKSpriteNode){
         let bang = SKEmitterNode(fileNamed: "Bang");
         bang?.position = alien.position;
         
@@ -95,6 +101,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         score += 5;
         saveScore();
+    }
+    
+    func killPlayer(alien: SKSpriteNode){
+        isGameOver = true;
+        
+        let bangAlien = SKEmitterNode(fileNamed: "Bang");
+        bangAlien?.position = alien.position;
+        
+        let bangPlayer = SKEmitterNode(fileNamed: "Bang");
+        bangPlayer?.position = player.position;
+        
+        self.addChild(bangAlien!);
+        self.addChild(bangPlayer!);
+        self.run(SKAction.playSoundFileNamed("bang", waitForCompletion: false));
+        
+        alien.removeFromParent();
+        player.removeFromParent();
+        
+        self.run(SKAction.wait(forDuration: 2)){
+            bangAlien?.removeFromParent();
+            bangPlayer?.removeFromParent();
+        }
+        score = 0;
+        
+        self.run(SKAction.wait(forDuration: 2)){
+            self.chaneScene(scene: SKScene(fileNamed: "Menu")!);
+        }
     }
     
     @objc func addAlien() {
@@ -125,29 +158,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fireBullet() {
-        self.run(SKAction.playSoundFileNamed("shot", waitForCompletion: false)); // Play fire sound.
-        
-        let bullet = SKSpriteNode(imageNamed: "torpedo"); // Get bullet image.
-        bullet.position = CGPoint(x: player.position.x, y: player.position.y + 5);
-        
-        bullet.physicsBody = SKPhysicsBody(circleOfRadius: bullet.size.width / 2);
-        bullet.physicsBody?.isDynamic = true;
-        bullet.physicsBody?.categoryBitMask = bulletCategory;
-        bullet.physicsBody?.contactTestBitMask = alienCategory;
-        bullet.physicsBody?.collisionBitMask = 0;
-        bullet.physicsBody?.usesPreciseCollisionDetection = true; // Make it touchable.
-        
-        self.addChild(bullet);
-        
-        let animationDuration: TimeInterval = 0.5; // The bullet speed.
-        var actions = [SKAction]();
-        
-        actions.append(SKAction.move(to: CGPoint(x: player.position.x,
-                                                 y: height + bullet.size.height),
-                                     duration: animationDuration));
-        actions.append(SKAction.removeFromParent());
-        
-        bullet.run(SKAction.sequence(actions));
+        if !isGameOver {
+            self.run(SKAction.playSoundFileNamed("shot", waitForCompletion: false)); // Play fire sound.
+            
+            let bullet = SKSpriteNode(imageNamed: "torpedo"); // Get bullet image.
+            bullet.position = CGPoint(x: player.position.x, y: player.position.y + 5);
+            
+            bullet.physicsBody = SKPhysicsBody(circleOfRadius: bullet.size.width / 2);
+            bullet.physicsBody?.isDynamic = true;
+            bullet.physicsBody?.categoryBitMask = bulletCategory;
+            bullet.physicsBody?.contactTestBitMask = alienCategory;
+            bullet.physicsBody?.collisionBitMask = 0;
+            bullet.physicsBody?.usesPreciseCollisionDetection = true; // Make it touchable.
+            
+            self.addChild(bullet);
+            
+            let animationDuration: TimeInterval = 0.5; // The bullet speed.
+            var actions = [SKAction]();
+            
+            actions.append(SKAction.move(to: CGPoint(x: player.position.x,
+                                                     y: height + bullet.size.height),
+                                         duration: animationDuration));
+            actions.append(SKAction.removeFromParent());
+            
+            bullet.run(SKAction.sequence(actions));
+        }
     }
     
     func initStarSpace() -> SKEmitterNode{
@@ -161,6 +196,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func initPlayer() -> SKSpriteNode {
         player = SKSpriteNode(imageNamed: "shuttle");
         player.position = CGPoint(x: width / 2, y: 40);
+        
+        player.physicsBody = SKPhysicsBody(circleOfRadius: player.size.width / 2);
+        player.physicsBody?.isDynamic = true;
+        player.physicsBody?.categoryBitMask = playerCategory;
+        player.physicsBody?.contactTestBitMask = alienCategory;
+        player.physicsBody?.collisionBitMask = 0;
+        player.physicsBody?.usesPreciseCollisionDetection = true; // Make it touchable.
+        
         return player;
     }
     
@@ -193,7 +236,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let nodesArray = self.nodes(at: location);
             
             if nodesArray.first?.name == "menuButton" {
-                // Load the SKScene from 'GameScene.sks'
                 chaneScene(scene: SKScene(fileNamed: "Menu")!);
             } else {
                 fireBullet();
