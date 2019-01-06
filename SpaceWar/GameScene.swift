@@ -219,7 +219,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func initMenuButton() -> SKSpriteNode {
         menuButton = SKSpriteNode(imageNamed: "menuIcon");
-        menuButton.position = CGPoint(x: width - 20, y: height - 20);
+        menuButton.position = CGPoint(x: width - 20, y: height - 25);
         menuButton.name = "menuButton";
         menuButton.size = CGSize(width: 20, height: 20);
         return menuButton;
