@@ -139,6 +139,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let position = CGFloat(availablePositionDiapason.nextInt());
         
         alien.position = CGPoint(x: position, y: height + alien.size.height);
+        alien.name = "alien";
         
         alien.physicsBody = SKPhysicsBody(rectangleOf: alien.size);
         alien.physicsBody?.isDynamic = true;
@@ -264,6 +265,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        for node in self.children {
+            if node.name == "alien" && node.position.y < 0 {
+                killPlayer(alien: node as! SKSpriteNode);
+            }
+        }
     }
 }
